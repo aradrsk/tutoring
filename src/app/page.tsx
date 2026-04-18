@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { SiteNav } from "@/components/site-nav";
+import { SiteFooter } from "@/components/site-footer";
 
 const LIME = "#B9FF66";
 const INK = "#191A23";
@@ -6,33 +8,7 @@ const INK = "#191A23";
 export default function Home() {
   return (
     <main className="min-h-screen bg-white text-[#191A23]">
-      {/* Nav */}
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold">
-          <span className="inline-block h-6 w-6 rounded-sm bg-[#191A23]" />
-          tutor<span className="text-[#B9FF66]">.</span>
-        </Link>
-        <div className="hidden items-center gap-7 text-[15px] md:flex">
-          <a href="#about" className="hover:underline">About</a>
-          <a href="#services" className="hover:underline">Sessions</a>
-          <a href="#how" className="hover:underline">How it works</a>
-          <a href="#pricing" className="hover:underline">Pricing</a>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className="hidden rounded-2xl px-5 py-2 text-[15px] font-medium hover:bg-zinc-100 sm:inline-flex"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className="rounded-2xl border-2 border-[#191A23] bg-[#191A23] px-5 py-2 text-[15px] font-medium text-white transition hover:bg-white hover:text-[#191A23]"
-          >
-            Book a session
-          </Link>
-        </div>
-      </nav>
+      <SiteNav />
 
       {/* Hero */}
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-10 lg:grid-cols-[1.1fr_1fr] lg:py-20">
@@ -228,18 +204,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-[#191A23] text-white">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-10 text-sm md:flex-row">
-          <p className="flex items-center gap-2 font-bold">
-            <span className="inline-block h-5 w-5 rounded-sm bg-[#B9FF66]" />
-            tutor.
-          </p>
-          <p className="text-white/50">
-            © 2026 · Built as a free prototype · America/Toronto
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

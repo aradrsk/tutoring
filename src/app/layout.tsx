@@ -13,8 +13,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tutoring Scheduler",
-  description: "Book 1:1 in-person English tutoring sessions.",
+  title: {
+    default: "Tutoring · K-12 English in Toronto",
+    template: "%s · tutor.",
+  },
+  description:
+    "1:1 English tutoring for K-12 students. In-person in Toronto. 30, 45, or 60 minute sessions. No DMs — just a confirmed slot.",
+  openGraph: {
+    title: "tutor. — K-12 English Tutoring in Toronto",
+    description:
+      "Book a 1:1 English tutoring session. In-person, Toronto, free while in prototype.",
+    type: "website",
+    locale: "en_CA",
+  },
 };
 
 export default function RootLayout({
@@ -27,7 +38,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-white text-[#191A23]">
+        {children}
+      </body>
     </html>
   );
 }
