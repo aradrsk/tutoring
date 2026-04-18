@@ -20,6 +20,14 @@ export default async function AccountBookingsPage() {
             tutor<span className="text-[#B9FF66]">.</span>
           </Link>
           <div className="flex items-center gap-3">
+            {user.role === "teacher" && (
+              <Link
+                href="/dashboard/availability"
+                className="rounded-2xl bg-[#B9FF66] px-4 py-2 text-sm font-medium text-[#191A23] hover:bg-white hover:ring-2 hover:ring-[#191A23]"
+              >
+                Manage availability
+              </Link>
+            )}
             <span className="hidden text-sm text-[#191A23]/60 sm:inline">
               {user.email}
             </span>
@@ -76,14 +84,14 @@ export default async function AccountBookingsPage() {
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link
-                href="/#services"
-                className="rounded-2xl border-2 border-[#191A23] bg-white px-6 py-3 text-sm font-medium transition hover:bg-zinc-50"
+                href="/book"
+                className="rounded-2xl bg-[#191A23] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#2a2b38]"
               >
-                Learn about sessions
+                Book a session
               </Link>
               <Link
                 href="/updates"
-                className="rounded-2xl bg-[#191A23] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#2a2b38]"
+                className="rounded-2xl border-2 border-[#191A23] bg-white px-6 py-3 text-sm font-medium transition hover:bg-zinc-50"
               >
                 What&apos;s new
               </Link>

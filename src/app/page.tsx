@@ -1,11 +1,87 @@
 import Link from "next/link";
+import { headers } from "next/headers";
+import { asc } from "drizzle-orm";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
+import { auth } from "@/lib/auth";
+import { db, schema } from "@/lib/db";
+import {
+  DOW_SHORT,
+  iterateTorontoDays,
+  torontoDow,
+  torontoWallToUtc,
+  TZ,
+} from "@/lib/availability";
 
 const LIME = "#B9FF66";
 const INK = "#191A23";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+type PublicDay = {
+  date: string;
+  dow: number;
+  weekday: string;
+  label: string;
+  blocked: boolean;
+  windows: { start: string; end: string }[];
+};
+
+async function loadPublicAvailability(): Promise<PublicDay[]> {
+  const [rules, blocks] = await Promise.all([
+    db
+      .select()
+      .from(schema.availabilityRules)
+      .orderBy(asc(schema.availabilityRules.startTime)),
+    db.select().from(schema.availabilityBlocks),
+  ]);
+
+  const activeRules = rules.filter((r) => r.active);
+  const blockedSet = new Set(blocks.map((b) => b.date));
+
+  const dates = iterateTorontoDays(new Date(), 30);
+  return dates.map((date) => {
+    const midday = torontoWallToUtc(date, "12:00");
+    const dow = torontoDow(midday);
+    const blocked = blockedSet.has(date);
+    const windows = activeRules
+      .filter((r) => r.dayOfWeek === dow)
+      .map((r) => ({
+        start: r.startTime.slice(0, 5),
+        end: r.endTime.slice(0, 5),
+      }));
+    return {
+      date,
+      dow,
+      weekday: DOW_SHORT[dow],
+      label: new Date(`${date}T12:00:00Z`).toLocaleDateString("en-CA", {
+        timeZone: TZ,
+        month: "short",
+        day: "numeric",
+      }),
+      blocked,
+      windows,
+    };
+  });
+}
+
+function primaryCtaHref(session: {
+  user: { emailVerified?: boolean };
+} | null) {
+  if (!session) return "/signup";
+  return "/book";
+}
+
+export default async function Home() {
+  const [session, days] = await Promise.all([
+    auth.api.getSession({ headers: await headers() }),
+    loadPublicAvailability(),
+  ]);
+
+  const ctaHref = primaryCtaHref(session);
+  const ctaLabel = session ? "Go to dashboard" : "Book a session";
+  const hasAnyAvailability = days.some((d) => !d.blocked && d.windows.length > 0);
+
   return (
     <main className="min-h-screen bg-white text-[#191A23]">
       <SiteNav />
@@ -29,16 +105,16 @@ export default function Home() {
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="/signup"
+              href={ctaHref}
               className="rounded-2xl bg-[#191A23] px-8 py-4 text-[15px] font-medium text-white transition hover:bg-[#2a2b38]"
             >
-              Book a session
+              {ctaLabel}
             </Link>
             <Link
-              href="#how"
+              href="#availability"
               className="rounded-2xl border-2 border-[#191A23] bg-white px-8 py-4 text-[15px] font-medium transition hover:bg-zinc-50"
             >
-              How it works
+              See availability
             </Link>
           </div>
         </div>
@@ -47,17 +123,50 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Logo strip */}
-      <section className="mx-auto max-w-6xl border-y border-zinc-200 px-6 py-8">
-        <ul className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 text-zinc-400">
-          {["TDSB", "Etobicoke", "Annex", "CollegiatePrep", "Parkdale", "Riverdale"].map(
-            (name) => (
-              <li key={name} className="text-lg font-semibold tracking-tight">
-                {name}
-              </li>
-            )
-          )}
-        </ul>
+      {/* Availability preview */}
+      <section id="availability" className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-5">
+          <div>
+            <h2 className="inline-block rounded-md bg-[#B9FF66] px-3 py-1 text-3xl font-medium md:text-4xl">
+              Availability
+            </h2>
+            <p className="mt-3 max-w-md text-base text-[#191A23]/70">
+              Next 30 days of open windows. All times in Toronto (ET). Pick a
+              length during booking — 30, 45, or 60 minutes.
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-xs">
+            <Legend dot="bg-[#B9FF66]" label="Open" />
+            <Legend dot="bg-red-300" label="Blocked" />
+            <Legend dot="bg-zinc-200" label="No hours" />
+          </div>
+        </div>
+
+        {!hasAnyAvailability ? (
+          <div className="rounded-[32px] border-2 border-dashed border-[#191A23]/20 bg-zinc-50 p-10 text-center">
+            <p className="text-lg font-medium">
+              No availability published yet
+            </p>
+            <p className="mt-2 text-sm text-[#191A23]/60">
+              The teacher hasn&apos;t set weekly windows. Check back shortly, or
+              sign up now — you&apos;ll be first in line.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            {days.slice(0, 15).map((d) => (
+              <DayCard key={d.date} day={d} />
+            ))}
+          </div>
+        )}
+        <div className="mt-6 flex justify-center">
+          <Link
+            href={ctaHref}
+            className="rounded-2xl bg-[#191A23] px-7 py-3.5 text-sm font-medium text-white hover:bg-[#2a2b38]"
+          >
+            {session ? "Pick a time" : "Sign up to book"} →
+          </Link>
+        </div>
       </section>
 
       {/* Sessions */}
@@ -285,6 +394,51 @@ function FactChip({ label, value }: { label: string; value: string }) {
     <div className="rounded-2xl bg-zinc-100 px-4 py-3">
       <p className="text-xs uppercase tracking-widest text-[#191A23]/50">{label}</p>
       <p className="mt-0.5 text-sm font-medium">{value}</p>
+    </div>
+  );
+}
+
+function Legend({ dot, label }: { dot: string; label: string }) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className={`inline-block h-2.5 w-2.5 rounded-full ${dot}`} />
+      <span className="text-[#191A23]/70">{label}</span>
+    </span>
+  );
+}
+
+function DayCard({ day }: { day: PublicDay }) {
+  const openCount = day.windows.length;
+  const hasWindows = openCount > 0 && !day.blocked;
+  const style = day.blocked
+    ? "border-red-300 bg-red-50"
+    : hasWindows
+    ? "border-[#191A23] bg-white"
+    : "border-[#191A23]/10 bg-zinc-50 opacity-70";
+  return (
+    <div className={`rounded-2xl border-2 p-4 ${style}`}>
+      <div className="mb-2 flex items-baseline justify-between">
+        <span className="text-xs font-semibold uppercase tracking-widest text-[#191A23]/60">
+          {day.weekday}
+        </span>
+        <span className="font-mono text-xs text-[#191A23]/50">{day.label}</span>
+      </div>
+      {day.blocked ? (
+        <p className="text-xs font-medium text-red-700">Blocked</p>
+      ) : openCount === 0 ? (
+        <p className="text-xs text-[#191A23]/40">—</p>
+      ) : (
+        <ul className="space-y-1">
+          {day.windows.map((w, i) => (
+            <li
+              key={i}
+              className="rounded-full bg-[#B9FF66] px-2.5 py-0.5 font-mono text-[11px] text-[#191A23]"
+            >
+              {w.start}–{w.end}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
