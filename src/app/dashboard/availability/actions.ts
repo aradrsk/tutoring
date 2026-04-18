@@ -1,13 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { db, schema } from "@/lib/db";
 
 async function requireTeacher() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) throw new Error("Unauthorized");
   if (session.user.role !== "teacher") throw new Error("Forbidden");
   return session;

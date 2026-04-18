@@ -1,15 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { db, schema } from "@/lib/db";
 
 const CANCEL_CUTOFF_MIN = 24 * 60;
 
 export async function cancelBookingAction(formData: FormData) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) throw new Error("Unauthorized");
 
   const id = String(formData.get("id") ?? "");

@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { asc } from "drizzle-orm";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { db, schema } from "@/lib/db";
 import {
   DOW_SHORT,
@@ -74,7 +73,7 @@ function primaryCtaHref(session: {
 
 export default async function Home() {
   const [session, days] = await Promise.all([
-    auth.api.getSession({ headers: await headers() }),
+    getSession(),
     loadPublicAvailability(),
   ]);
 

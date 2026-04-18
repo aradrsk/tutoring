@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import Link from "next/link";
 import { and, asc, desc, eq, gte, lt } from "drizzle-orm";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { db, schema } from "@/lib/db";
 import { TZ } from "@/lib/availability";
 import { LogoutButton } from "./logout-button";
@@ -13,7 +12,7 @@ export const dynamic = "force-dynamic";
 const CANCEL_CUTOFF_MS = 24 * 60 * 60 * 1000;
 
 export default async function AccountBookingsPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) redirect("/login");
   const { user } = session;
   const firstName = user.name?.split(" ")[0] ?? "";
@@ -219,7 +218,7 @@ export default async function AccountBookingsPage() {
             <DetailRow label="Name" value={user.name ?? "—"} />
             <DetailRow label="Email" value={user.email} />
             <DetailRow label="Age" value={user.age?.toString() ?? "—"} />
-            <DetailRow label="Role" value={user.role ?? "user"} />
+            <DetailRow label="Role" value={user.role} />
           </dl>
         </section>
       </div>

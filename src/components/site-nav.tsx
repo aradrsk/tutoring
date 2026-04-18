@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 
 export async function SiteNav() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
 
   return (
     <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">

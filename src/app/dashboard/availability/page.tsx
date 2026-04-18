@@ -1,8 +1,7 @@
 import { redirect, notFound } from "next/navigation";
-import { headers } from "next/headers";
 import Link from "next/link";
 import { asc } from "drizzle-orm";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { db, schema } from "@/lib/db";
 import {
   DOW_LABELS,
@@ -28,7 +27,7 @@ export default async function AvailabilityPage({
 }: {
   searchParams: Promise<{ d?: string }>;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) redirect("/login");
   if (session.user.role !== "teacher") notFound();
 

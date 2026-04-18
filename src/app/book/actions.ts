@@ -1,8 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { db, schema } from "@/lib/db";
 import {
   generateSlots,
@@ -33,7 +32,7 @@ export async function createBookingAction(
   _prev: BookingResult | null,
   formData: FormData
 ): Promise<BookingResult> {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) return { ok: false, error: "You must be logged in." };
 
   // Placeholder for when email verification is re-enabled in TU-9.

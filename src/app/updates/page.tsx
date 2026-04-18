@@ -19,6 +19,17 @@ const UPDATES: Update[] = [
   {
     date: "2026-04-18",
     tag: "infra",
+    title: "Auth swapped from better-auth to Firebase",
+    body: [
+      "Email + password and Google sign-in both go through Firebase now.",
+      "Firebase owns identity (password hashing, OAuth, email verification); our database keeps the app-specific bits — role, age, and booking relationships keyed by Firebase UID.",
+      "Session is a signed httpOnly cookie created from a verified Firebase ID token. No more custom session table.",
+      "Anyone who made a test account earlier will need to sign up again — the user table was reset during the migration.",
+    ],
+  },
+  {
+    date: "2026-04-18",
+    tag: "infra",
     title: "Email design now lives in Resend",
     body: [
       "Booking confirmation emails are now sent via a Resend-hosted template (alias: session-confirmation).",
