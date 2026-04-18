@@ -19,6 +19,45 @@ const UPDATES: Update[] = [
   {
     date: "2026-04-18",
     tag: "design",
+    title: "Booking step 2 is now a calendar",
+    body: [
+      "The long vertical list of days in the booking wizard is gone.",
+      "New month-calendar grid: green = open (shows how many start times), grey = no availability, red = blocked.",
+      "Tap a date → open times appear in a panel below. Much faster than scrolling a list.",
+      "Works across month boundaries with prev/next arrows when the 30-day horizon crosses a month.",
+    ],
+  },
+  {
+    date: "2026-04-18",
+    tag: "design",
+    title: "Teacher has a name: Theepa Jeyapalan",
+    body: [
+      "The landing page 'Your teacher' card now reads Theepa Jeyapalan. Bio copy updated too.",
+    ],
+  },
+  {
+    date: "2026-04-18",
+    tag: "shipped",
+    title: "Booking flow is live",
+    body: [
+      "The /book route is a three-step wizard: pick length (30/45/60), pick a start time, review & confirm.",
+      "The server double-checks every booking against live availability before inserting, and catches the Postgres exclusion-violation cleanly when two people try to grab the same slot.",
+      "Dashboard empty-state now points straight to /book.",
+    ],
+  },
+  {
+    date: "2026-04-18",
+    tag: "shipped",
+    title: "Teacher availability editor + public preview",
+    body: [
+      "Teachers now have /dashboard/availability: add weekly windows, block specific dates, and a 14-day preview that overlays 30/45/60-minute valid start times.",
+      "Landing page shows real availability for the next 15 days, with a green/grey/red legend. No more fake placeholder school logos.",
+      "The whole slot-generation engine is shared across teacher preview, landing page, and booking — so all three stay in sync automatically.",
+    ],
+  },
+  {
+    date: "2026-04-18",
+    tag: "design",
     title: "Full UX rehaul + /updates page",
     body: [
       "Introduced a shared Nav + Footer across every page — logged-in users now see a Dashboard link, logged-out users see Log in + Book a session.",
