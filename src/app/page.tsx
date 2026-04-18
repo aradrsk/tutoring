@@ -266,11 +266,11 @@ export default async function Home() {
               <p className="text-sm uppercase tracking-widest text-[#191A23]/50">
                 Lead tutor
               </p>
-              <h3 className="mt-1 text-3xl font-medium">Your Teacher</h3>
+              <h3 className="mt-1 text-3xl font-medium">Theepa Jeyapalan</h3>
               <p className="mt-4 max-w-xl text-[#191A23]/70">
-                Patient, structured, and kid-friendly. I help students read with
-                confidence, write with clarity, and actually enjoy the process.
-                Focus areas: ESL, essay coaching, standardized test prep.
+                Patient, structured, and kid-friendly. Theepa helps students read
+                with confidence, write with clarity, and actually enjoy the
+                process. Focus areas: ESL, essay coaching, standardized test prep.
               </p>
               <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
                 <FactChip label="Availability" value="Mon-Fri" />
