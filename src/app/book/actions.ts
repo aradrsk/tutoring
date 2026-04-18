@@ -7,8 +7,15 @@ import { db, schema } from "@/lib/db";
 import {
   generateSlots,
   loadAvailabilityInputs,
+  TZ,
   type Duration,
 } from "@/lib/availability";
+import { sendEmail } from "@/lib/emails/send";
+import { renderBookingConfirmation } from "@/lib/emails/booking-confirmation";
+
+const TEACHER_NAME_DEFAULT = "Theepa Jeyapalan";
+const TEACHER_ADDRESS_DEFAULT =
+  "Address in this email (teacher's home, Toronto)";
 
 export type BookingResult =
   | { ok: true; bookingId: string }
@@ -76,6 +83,44 @@ export async function createBookingAction(
     revalidatePath("/");
     revalidatePath("/account/bookings");
     revalidatePath("/dashboard/availability");
+
+    // Fire-and-forget booking confirmation email. Failure doesn't roll back
+    // the booking — the row is already the source of truth.
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tutoring.aradrsk.com";
+    const dateLabel = startAt.toLocaleDateString("en-CA", {
+      timeZone: TZ,
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    });
+    const timeLabel = `${startAt.toLocaleTimeString("en-CA", {
+      timeZone: TZ,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })} (Toronto)`;
+
+    const { subject, html, text } = renderBookingConfirmation({
+      studentName: session.user.name ?? "there",
+      teacherName: process.env.TEACHER_NAME ?? TEACHER_NAME_DEFAULT,
+      dateLabel,
+      timeLabel,
+      durationMinutes: duration,
+      address: process.env.TEACHER_ADDRESS ?? TEACHER_ADDRESS_DEFAULT,
+      cancelUrl: `${siteUrl}/account/bookings`,
+      siteUrl,
+    });
+
+    // Don't await — keep the booking response fast.
+    void sendEmail({
+      to: session.user.email,
+      subject,
+      html,
+      text,
+    }).then((res) => {
+      if (!res.ok) console.warn("[email] booking confirmation failed:", res.error);
+    });
+
     return { ok: true, bookingId: row!.id };
   } catch (err) {
     // Postgres exclusion_violation = 23P01

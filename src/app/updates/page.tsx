@@ -19,6 +19,18 @@ const UPDATES: Update[] = [
   {
     date: "2026-04-18",
     tag: "shipped",
+    title: "Booking confirmation emails via Resend",
+    body: [
+      "Every confirmed booking now fires a branded HTML email: session time, duration, where, and a link back to the dashboard.",
+      "Lime-and-ink system carried over into the email so the brand stays consistent. Table-based layout with inline styles, renders everywhere from Gmail to Outlook.",
+      "Fire-and-forget: if the email fails to send, the booking still succeeds. The DB is the source of truth, not the email.",
+      "While the custom sending domain (mail.tutoring.aradrsk.com) verifies with DNS, we're sending from Resend's shared onboarding@resend.dev. Flip the EMAIL_FROM env once verification completes.",
+      "Preview the template live at /dev/email/booking.",
+    ],
+  },
+  {
+    date: "2026-04-18",
+    tag: "shipped",
     title: "Dashboard shows your real bookings",
     body: [
       "The /account/bookings page now reads from the database instead of showing a placeholder.",
