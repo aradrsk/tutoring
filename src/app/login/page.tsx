@@ -1,19 +1,37 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { login, type AuthState } from "../actions";
-
-const initial: AuthState = { error: null };
+import { signIn } from "@/lib/auth-client";
 
 export default function LoginPage() {
-  const [state, action, pending] = useActionState(login, initial);
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    const form = new FormData(e.currentTarget);
+    const email = String(form.get("email") ?? "").trim().toLowerCase();
+    const password = String(form.get("password") ?? "");
+    if (!email || !password) return setError("Email and password are required.");
+
+    setPending(true);
+    const { error: err } = await signIn.email({ email, password });
+    setPending(false);
+
+    if (err) return setError(err.message ?? "Login failed.");
+    router.push("/account/bookings");
+    router.refresh();
+  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-16">
       <h1 className="mb-8 text-2xl font-semibold tracking-tight">Log in</h1>
 
-      <form action={action} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4">
         <label className="block">
           <span className="mb-1 block text-sm font-medium">Email</span>
           <input
@@ -35,9 +53,9 @@ export default function LoginPage() {
           />
         </label>
 
-        {state.error && (
+        {error && (
           <p role="alert" className="text-sm text-red-600">
-            {state.error}
+            {error}
           </p>
         )}
 
