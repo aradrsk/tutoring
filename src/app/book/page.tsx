@@ -54,9 +54,7 @@ export default async function BookPage({
       duration,
       horizonDays: 30,
     });
-    return plan.days
-      .filter((d) => d.starts.length > 0 || plan.blockedDates.has(d.date))
-      .map((d) => {
+    return plan.days.map((d) => {
         const midday = torontoWallToUtc(d.date, "12:00");
         const dow = torontoDow(midday);
         return {
