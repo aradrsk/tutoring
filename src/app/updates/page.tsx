@@ -18,6 +18,16 @@ type Update = {
 const UPDATES: Update[] = [
   {
     date: "2026-04-18",
+    tag: "infra",
+    title: "Email design now lives in Resend",
+    body: [
+      "Booking confirmation emails are now sent via a Resend-hosted template (alias: session-confirmation).",
+      "Design edits happen in Resend's UI — no redeploy needed for copy or layout tweaks.",
+      "Server sends only the eight variables the template expects: student_name, teacher_name, date_label, time_label, duration_minutes, address, cancel_url, site_url.",
+    ],
+  },
+  {
+    date: "2026-04-18",
     tag: "shipped",
     title: "Booking confirmation emails via Resend",
     body: [

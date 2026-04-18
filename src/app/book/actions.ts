@@ -10,12 +10,14 @@ import {
   TZ,
   type Duration,
 } from "@/lib/availability";
-import { sendEmail } from "@/lib/emails/send";
-import { renderBookingConfirmation } from "@/lib/emails/booking-confirmation";
+import { sendTemplate } from "@/lib/emails/send";
 
 const TEACHER_NAME_DEFAULT = "Theepa Jeyapalan";
 const TEACHER_ADDRESS_DEFAULT =
   "Address in this email (teacher's home, Toronto)";
+const BOOKING_CONFIRMATION_TEMPLATE_ID =
+  process.env.RESEND_TEMPLATE_BOOKING ??
+  "406b1842-5f5d-4791-a86e-5a0940d0a512";
 
 export type BookingResult =
   | { ok: true; bookingId: string }
@@ -100,23 +102,20 @@ export async function createBookingAction(
       hour12: false,
     })} (Toronto)`;
 
-    const { subject, html, text } = renderBookingConfirmation({
-      studentName: session.user.name ?? "there",
-      teacherName: process.env.TEACHER_NAME ?? TEACHER_NAME_DEFAULT,
-      dateLabel,
-      timeLabel,
-      durationMinutes: duration,
-      address: process.env.TEACHER_ADDRESS ?? TEACHER_ADDRESS_DEFAULT,
-      cancelUrl: `${siteUrl}/account/bookings`,
-      siteUrl,
-    });
-
     // Don't await — keep the booking response fast.
-    void sendEmail({
+    void sendTemplate({
       to: session.user.email,
-      subject,
-      html,
-      text,
+      templateId: BOOKING_CONFIRMATION_TEMPLATE_ID,
+      variables: {
+        student_name: session.user.name ?? "there",
+        teacher_name: process.env.TEACHER_NAME ?? TEACHER_NAME_DEFAULT,
+        date_label: dateLabel,
+        time_label: timeLabel,
+        duration_minutes: duration,
+        address: process.env.TEACHER_ADDRESS ?? TEACHER_ADDRESS_DEFAULT,
+        cancel_url: `${siteUrl}/account/bookings`,
+        site_url: siteUrl,
+      },
     }).then((res) => {
       if (!res.ok) console.warn("[email] booking confirmation failed:", res.error);
     });
