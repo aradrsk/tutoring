@@ -18,6 +18,17 @@ type Update = {
 const UPDATES: Update[] = [
   {
     date: "2026-04-18",
+    tag: "shipped",
+    title: "Dashboard shows your real bookings",
+    body: [
+      "The /account/bookings page now reads from the database instead of showing a placeholder.",
+      "Upcoming sessions appear in a chunky card list with date, time, and duration. Past sessions collapse into a muted list below.",
+      "Students can cancel upcoming sessions more than 24 hours out. Closer than that, the cancel button is hidden and a note explains why. Teachers can cancel any session (emergencies happen).",
+      "Teachers see every confirmed booking with the student's name and email, not just their own.",
+    ],
+  },
+  {
+    date: "2026-04-18",
     tag: "design",
     title: "Booking step 2 is now a calendar",
     body: [
