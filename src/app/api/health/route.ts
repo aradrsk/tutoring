@@ -4,10 +4,10 @@ import { sql } from "drizzle-orm";
 
 export async function GET() {
   try {
-    const result = db.get<{ ok: number }>(sql`select 1 as ok`);
-    const ok = result?.ok === 1;
+    const rows = await db.execute<{ ok: number }>(sql`select 1 as ok`);
+    const ok = rows[0]?.ok === 1;
     return NextResponse.json(
-      { ok, db: "sqlite", timestamp: new Date().toISOString() },
+      { ok, db: "postgres", timestamp: new Date().toISOString() },
       { status: ok ? 200 : 503 }
     );
   } catch (err) {

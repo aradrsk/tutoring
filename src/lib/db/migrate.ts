@@ -1,13 +1,22 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import postgres from "postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
 
-const DB_PATH = process.env.DATABASE_FILE ?? "./local.db";
-const sqlite = new Database(DB_PATH);
-sqlite.pragma("journal_mode = WAL");
-sqlite.pragma("foreign_keys = ON");
-const db = drizzle(sqlite);
+async function main() {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is not set");
+  }
 
-migrate(db, { migrationsFolder: "./drizzle" });
-console.log("migrations applied");
-sqlite.close();
+  const client = postgres(connectionString, { max: 1 });
+  const db = drizzle(client);
+
+  await migrate(db, { migrationsFolder: "./drizzle" });
+  console.log("migrations applied");
+  await client.end();
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -1,27 +1,48 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import {
+  pgTable,
+  text,
+  integer,
+  timestamp,
+  boolean,
+  pgEnum,
+  date,
+  time,
+  smallint,
+  uniqueIndex,
+  index,
+  check,
+} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+
+// ===== enums =====
+
+export const roleEnum = pgEnum("user_role", ["teacher", "user"]);
+export const bookingStatusEnum = pgEnum("booking_status", [
+  "confirmed",
+  "cancelled",
+]);
 
 // ===== better-auth tables =====
 
-export const user = sqliteTable("user", {
+export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  emailVerified: integer("emailVerified", { mode: "boolean" }).notNull().default(false),
+  emailVerified: boolean("emailVerified").notNull().default(false),
   image: text("image"),
-  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull(),
   // App-level extensions
   age: integer("age"),
-  role: text("role", { enum: ["teacher", "user"] }).notNull().default("user"),
+  role: roleEnum("role").notNull().default("user"),
 });
 
-export const session = sqliteTable("session", {
+export const session = pgTable("session", {
   id: text("id").primaryKey(),
-  expiresAt: integer("expiresAt", { mode: "timestamp" }).notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
   token: text("token").notNull().unique(),
-  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull(),
   ipAddress: text("ipAddress"),
   userAgent: text("userAgent"),
   userId: text("userId")
@@ -29,7 +50,7 @@ export const session = sqliteTable("session", {
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
-export const account = sqliteTable("account", {
+export const account = pgTable("account", {
   id: text("id").primaryKey(),
   accountId: text("accountId").notNull(),
   providerId: text("providerId").notNull(),
@@ -39,64 +60,86 @@ export const account = sqliteTable("account", {
   accessToken: text("accessToken"),
   refreshToken: text("refreshToken"),
   idToken: text("idToken"),
-  accessTokenExpiresAt: integer("accessTokenExpiresAt", { mode: "timestamp" }),
-  refreshTokenExpiresAt: integer("refreshTokenExpiresAt", { mode: "timestamp" }),
+  accessTokenExpiresAt: timestamp("accessTokenExpiresAt", {
+    withTimezone: true,
+  }),
+  refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt", {
+    withTimezone: true,
+  }),
   scope: text("scope"),
   password: text("password"),
-  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull(),
 });
 
-export const verification = sqliteTable("verification", {
+export const verification = pgTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
-  expiresAt: integer("expiresAt", { mode: "timestamp" }).notNull(),
-  createdAt: integer("createdAt", { mode: "timestamp" }),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }),
 });
 
 // ===== app tables =====
 
-export const availabilityRules = sqliteTable("availability_rules", {
-  id: text("id")
-    .primaryKey()
-    .default(sql`(lower(hex(randomblob(16))))`),
-  dayOfWeek: integer("day_of_week").notNull(),
-  startTime: text("start_time").notNull(), // "HH:MM"
-  endTime: text("end_time").notNull(),
-  active: integer("active", { mode: "boolean" }).notNull().default(true),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(strftime('%s','now'))`),
-});
+export const availabilityRules = pgTable(
+  "availability_rules",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+    dayOfWeek: smallint("day_of_week").notNull(),
+    startTime: time("start_time").notNull(),
+    endTime: time("end_time").notNull(),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    check("availability_rules_day_check", sql`${t.dayOfWeek} between 0 and 6`),
+    check("availability_rules_time_order", sql`${t.endTime} > ${t.startTime}`),
+    index("availability_rules_day_idx").on(t.dayOfWeek),
+  ]
+);
 
-export const availabilityBlocks = sqliteTable("availability_blocks", {
-  id: text("id")
-    .primaryKey()
-    .default(sql`(lower(hex(randomblob(16))))`),
-  date: text("date").notNull().unique(), // "YYYY-MM-DD"
-  reason: text("reason"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(strftime('%s','now'))`),
-});
+export const availabilityBlocks = pgTable(
+  "availability_blocks",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+    date: date("date").notNull(),
+    reason: text("reason"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [uniqueIndex("availability_blocks_date_unique").on(t.date)]
+);
 
-export const bookings = sqliteTable("bookings", {
-  id: text("id")
-    .primaryKey()
-    .default(sql`(lower(hex(randomblob(16))))`),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "restrict" }),
-  startAt: integer("start_at", { mode: "timestamp" }).notNull(),
-  durationMinutes: integer("duration_minutes").notNull(), // CHECK in (30, 45, 60) enforced in app layer
-  status: text("status", { enum: ["confirmed", "cancelled"] })
-    .notNull()
-    .default("confirmed"),
-  cancelledAt: integer("cancelled_at", { mode: "timestamp" }),
-  cancelledBy: text("cancelled_by").references(() => user.id),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(strftime('%s','now'))`),
-});
+export const bookings = pgTable(
+  "bookings",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    startAt: timestamp("start_at", { withTimezone: true }).notNull(),
+    durationMinutes: integer("duration_minutes").notNull(),
+    // end_at is maintained by the bookings_set_end_at trigger (migration 0001).
+    // Treated as read-only from app code; don't set on insert/update.
+    endAt: timestamp("end_at", { withTimezone: true }),
+    status: bookingStatusEnum("status").notNull().default("confirmed"),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+    cancelledBy: text("cancelled_by").references(() => user.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    check(
+      "bookings_duration_check",
+      sql`${t.durationMinutes} in (30, 45, 60)`
+    ),
+    index("bookings_user_idx").on(t.userId, t.startAt),
+    index("bookings_start_idx").on(t.startAt),
+  ]
+);
