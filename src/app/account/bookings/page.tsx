@@ -10,7 +10,7 @@ import { cancelBookingAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-const CANCEL_CUTOFF_MS = 24 * 60 * 60 * 1000;
+const CANCEL_CUTOFF_MS = 12 * 60 * 60 * 1000;
 
 export default async function AccountBookingsPage() {
   const session = await getSession();
@@ -257,7 +257,7 @@ function BookingRow({
     (viewerRole === "teacher" || untilMs >= CANCEL_CUTOFF_MS);
   const cancelLockReason =
     viewerRole === "student" && untilMs < CANCEL_CUTOFF_MS
-      ? "Less than 24h to start — can't cancel"
+      ? "Less than 12h to start — can't cancel"
       : null;
 
   return (

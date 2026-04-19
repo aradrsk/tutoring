@@ -91,7 +91,7 @@ function buildHtml(d: BookingConfirmationData): string {
                 ${detailRow("Length", `${d.durationMinutes} minutes`)}
                 ${detailRow("Where", e(d.address))}
                 ${detailRow("Teacher", e(d.teacherName))}
-                ${detailRow("Cancel by", "24 hours before start")}
+                ${detailRow("Cancel by", "12 hours before start")}
               </table>
             </td>
           </tr>
@@ -114,7 +114,7 @@ function buildHtml(d: BookingConfirmationData): string {
           <!-- Small print -->
           <tr>
             <td style="padding:16px 32px 28px 32px;font-size:13px;line-height:1.5;color:#6b6b6b;text-align:center;">
-              Need to cancel? You can do it from your dashboard up to 24 hours before the session starts.
+              Need to cancel? You can do it from your dashboard up to 12 hours before the session starts.
             </td>
           </tr>
 
@@ -162,7 +162,7 @@ function buildText(d: BookingConfirmationData): string {
     `When:    ${d.dateLabel} · ${d.timeLabel}`,
     `Length:  ${d.durationMinutes} minutes`,
     `Where:   ${d.address}`,
-    `Cancel:  up to 24 hours before start`,
+    `Cancel:  up to 12 hours before start`,
     ``,
     `Dashboard: ${d.cancelUrl}`,
     ``,

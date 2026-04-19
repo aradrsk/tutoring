@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { getSession } from "@/lib/session";
 import { db, schema } from "@/lib/db";
 
-const CANCEL_CUTOFF_MIN = 24 * 60;
+const CANCEL_CUTOFF_MIN = 12 * 60;
 
 export async function cancelBookingAction(formData: FormData) {
   const session = await getSession();
@@ -28,12 +28,12 @@ export async function cancelBookingAction(formData: FormData) {
 
   if (booking.status === "cancelled") return; // idempotent
 
-  // Enforce 24h cutoff for non-teacher cancels (teacher can always cancel).
+  // Enforce 12h cutoff for non-teacher cancels (teacher can always cancel).
   if (!isTeacher) {
     const minutesUntilStart =
       (new Date(booking.startAt).getTime() - Date.now()) / 60000;
     if (minutesUntilStart < CANCEL_CUTOFF_MIN) {
-      throw new Error("Too close to start time — cancel at least 24 hours ahead.");
+      throw new Error("Too close to start time — cancel at least 12 hours ahead.");
     }
   }
 

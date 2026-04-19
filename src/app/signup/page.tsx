@@ -114,7 +114,7 @@ export default function SignupPage() {
               "First session free",
               "30, 45, or 60 minute slots",
               "Confirmation email with teacher's address",
-              "Cancel up to 24 hours before",
+              "Cancel up to 12 hours before",
             ].map((t) => (
               <li key={t} className="flex items-center gap-3">
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#B9FF66] text-sm font-bold text-[#191A23]">

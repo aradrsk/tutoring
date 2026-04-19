@@ -140,7 +140,7 @@ export default async function BookPage({
             .
           </h1>
           <p className="mt-3 max-w-xl text-[#191A23]/70">
-            All times shown in Toronto (ET). You can cancel up to 24 hours before.
+            All times shown in Toronto (ET). You can cancel up to 12 hours before.
           </p>
         </div>
 

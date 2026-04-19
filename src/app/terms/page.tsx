@@ -62,8 +62,8 @@ export default function TermsPage() {
               applies to you.
             </li>
             <li>
-              You can cancel a booking up to 24 hours before the start time,
-              from your dashboard. Inside 24 hours, cancellation requires
+              You can cancel a booking up to 12 hours before the start time,
+              from your dashboard. Inside 12 hours, cancellation requires
               contacting the teacher directly.
             </li>
             <li>

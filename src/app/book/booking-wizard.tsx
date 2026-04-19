@@ -228,7 +228,7 @@ export function BookingWizard({
                 }
               />
               <Row label="Where" value="Teacher's home (address in confirmation email)" />
-              <Row label="Cancel by" value="24 hours before start" />
+              <Row label="Cancel by" value="12 hours before start" />
             </dl>
 
             {result && !result.ok && (

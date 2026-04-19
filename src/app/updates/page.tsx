@@ -18,6 +18,15 @@ type Update = {
 const UPDATES: Update[] = [
   {
     date: "2026-04-19",
+    tag: "fix",
+    title: "Cancellation window: 24h → 12h",
+    body: [
+      "You can now cancel a booking up to 12 hours before the start time (down from 24). Dashboard, signup copy, terms, booking review, and confirmation email all updated.",
+      "The Resend-hosted email template still needs a matching edit in the Resend UI (we can only change template copy there, not in code).",
+    ],
+  },
+  {
+    date: "2026-04-19",
     tag: "shipped",
     title: "Stripe payments + first session free",
     body: [
