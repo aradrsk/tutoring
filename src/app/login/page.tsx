@@ -10,6 +10,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase-client";
 import { authErrorMessage } from "@/lib/auth-errors";
+import { BrandMark } from "@/components/brand-mark";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -73,7 +74,7 @@ export default function LoginPage() {
     <main className="min-h-screen bg-white">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold">
-          <span className="inline-block h-6 w-6 rounded-sm bg-[#191A23]" />
+          <BrandMark size={28} colour="#B9FF66" background="#191A23" />
           tutor<span className="text-[#B9FF66]">.</span>
         </Link>
         <Link href="/signup" className="text-[15px] font-medium hover:underline">

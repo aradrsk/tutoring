@@ -19,6 +19,7 @@ import {
   deleteBlockAction,
 } from "./actions";
 import { LogoutButton } from "@/app/account/bookings/logout-button";
+import { BrandMark } from "@/components/brand-mark";
 
 export const dynamic = "force-dynamic";
 
@@ -59,7 +60,7 @@ export default async function AvailabilityPage({
       <header className="border-b-2 border-[#191A23]/10 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <Link href="/" className="flex items-center gap-2 text-xl font-bold">
-            <span className="inline-block h-6 w-6 rounded-sm bg-[#191A23]" />
+            <BrandMark size={28} colour="#B9FF66" background="#191A23" />
             tutor<span className="text-[#B9FF66]">.</span>
           </Link>
           <nav className="hidden gap-5 text-sm md:flex">

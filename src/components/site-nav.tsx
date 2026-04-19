@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSession } from "@/lib/session";
+import { BrandMark } from "./brand-mark";
 
 export async function SiteNav() {
   const session = await getSession();
@@ -7,7 +8,7 @@ export async function SiteNav() {
   return (
     <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
       <Link href="/" className="flex items-center gap-2 text-xl font-bold">
-        <span className="inline-block h-6 w-6 rounded-sm bg-[#191A23]" />
+        <BrandMark size={28} colour="#B9FF66" background="#191A23" />
         tutor<span className="text-[#B9FF66]">.</span>
       </Link>
       <div className="hidden items-center gap-7 text-[15px] md:flex">

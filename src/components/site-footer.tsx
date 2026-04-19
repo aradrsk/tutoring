@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandMark } from "./brand-mark";
 
 export function SiteFooter() {
   return (
@@ -7,7 +8,7 @@ export function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
             <p className="flex items-center gap-2 text-xl font-bold">
-              <span className="inline-block h-5 w-5 rounded-sm bg-[#B9FF66]" />
+              <BrandMark size={22} colour="#B9FF66" background="#191A23" />
               tutor<span className="text-[#B9FF66]">.</span>
             </p>
             <p className="mt-4 max-w-xs text-sm text-white/60">

@@ -18,6 +18,15 @@ type Update = {
 const UPDATES: Update[] = [
   {
     date: "2026-04-18",
+    tag: "design",
+    title: "Brand mark lands on every page",
+    body: [
+      "Replaced the plain ink squares in the nav, footer, and every page header with the actual tutor. brand mark — a lime T with a period, on an ink rounded-square background.",
+      "Same mark is now the browser favicon and the iOS home-screen icon.",
+    ],
+  },
+  {
+    date: "2026-04-18",
     tag: "shipped",
     title: "Post-Google-signup profile step",
     body: [

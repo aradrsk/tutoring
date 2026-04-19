@@ -4,6 +4,7 @@ import { and, asc, desc, eq, gte, lt } from "drizzle-orm";
 import { getSession } from "@/lib/session";
 import { db, schema } from "@/lib/db";
 import { TZ } from "@/lib/availability";
+import { BrandMark } from "@/components/brand-mark";
 import { LogoutButton } from "./logout-button";
 import { cancelBookingAction } from "./actions";
 
@@ -69,7 +70,7 @@ export default async function AccountBookingsPage() {
       <header className="border-b-2 border-[#191A23]/10 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <Link href="/" className="flex items-center gap-2 text-xl font-bold">
-            <span className="inline-block h-6 w-6 rounded-sm bg-[#191A23]" />
+            <BrandMark size={28} colour="#B9FF66" background="#191A23" />
             tutor<span className="text-[#B9FF66]">.</span>
           </Link>
           <div className="flex items-center gap-3">
