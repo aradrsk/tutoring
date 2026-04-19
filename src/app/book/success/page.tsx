@@ -7,7 +7,7 @@ import { db, schema } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { BrandMark } from "@/components/brand-mark";
 import { TZ, type Duration } from "@/lib/availability";
-import { sendConfirmationEmail } from "../actions";
+import { sendBookingConfirmation } from "@/lib/emails/booking-notify";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +63,7 @@ export default async function BookSuccessPage({
 
     const siteUrl =
       process.env.NEXT_PUBLIC_SITE_URL ?? "https://tutoring.aradrsk.com";
-    sendConfirmationEmail({
+    sendBookingConfirmation({
       toEmail: session.user.email,
       studentName: session.user.name ?? "there",
       startAt: new Date(booking.startAt),

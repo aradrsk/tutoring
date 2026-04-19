@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { db, schema } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
-import { sendConfirmationEmail } from "@/app/book/actions";
+import { sendBookingConfirmation } from "@/lib/emails/booking-notify";
 import type { Duration } from "@/lib/availability";
 
 export async function POST(req: NextRequest) {
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         if (user) {
           const siteUrl =
             process.env.NEXT_PUBLIC_SITE_URL ?? "https://tutoring.aradrsk.com";
-          sendConfirmationEmail({
+          sendBookingConfirmation({
             toEmail: user.email,
             studentName: user.name || "there",
             startAt: new Date(row.startAt),
