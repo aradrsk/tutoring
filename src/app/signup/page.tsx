@@ -10,6 +10,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase-client";
+import { authErrorMessage } from "@/lib/auth-errors";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -26,8 +27,8 @@ export default function SignupPage() {
       body: JSON.stringify({ idToken, age }),
     });
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error ?? "Session creation failed.");
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      throw { code: data.error ?? "session_create_failed", message: data.error };
     }
     router.push("/account/bookings");
     router.refresh();
@@ -60,7 +61,8 @@ export default function SignupPage() {
       await updateProfile(cred.user, { displayName: name });
       await finishLogin(age);
     } catch (err) {
-      setError((err as Error).message);
+      const msg = authErrorMessage(err);
+      if (msg) setError(msg);
     } finally {
       setPending(false);
     }
@@ -74,7 +76,8 @@ export default function SignupPage() {
       await signInWithPopup(auth, provider);
       await finishLogin(null);
     } catch (err) {
-      setError((err as Error).message);
+      const msg = authErrorMessage(err);
+      if (msg) setError(msg);
     } finally {
       setPending(false);
     }

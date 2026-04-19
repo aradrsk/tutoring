@@ -9,6 +9,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase-client";
+import { authErrorMessage } from "@/lib/auth-errors";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,8 +26,8 @@ export default function LoginPage() {
       body: JSON.stringify({ idToken }),
     });
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error ?? "Session creation failed.");
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      throw { code: data.error ?? "session_create_failed", message: data.error };
     }
     router.push("/account/bookings");
     router.refresh();
@@ -45,7 +46,8 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       await finishLogin();
     } catch (err) {
-      setError((err as Error).message);
+      const msg = authErrorMessage(err);
+      if (msg) setError(msg);
     } finally {
       setPending(false);
     }
@@ -59,7 +61,8 @@ export default function LoginPage() {
       await signInWithPopup(auth, provider);
       await finishLogin();
     } catch (err) {
-      setError((err as Error).message);
+      const msg = authErrorMessage(err);
+      if (msg) setError(msg);
     } finally {
       setPending(false);
     }

@@ -18,6 +18,15 @@ type Update = {
 const UPDATES: Update[] = [
   {
     date: "2026-04-18",
+    tag: "fix",
+    title: "Human-readable auth errors",
+    body: [
+      "Raw Firebase errors like 'auth/popup-closed-by-user' are now translated into plain English on the signup and login pages.",
+      "Cancelling the Google popup is silent (no red error splashed across the form). Wrong password, network errors, blocked popups, and similar all have friendly messages.",
+    ],
+  },
+  {
+    date: "2026-04-18",
     tag: "infra",
     title: "Auth swapped from better-auth to Firebase",
     body: [
