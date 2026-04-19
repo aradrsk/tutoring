@@ -24,6 +24,9 @@ export default async function BookPage({
 }) {
   const session = await getSession();
   if (!session) redirect("/login");
+  if (session.user.age == null || !session.user.name.trim()) {
+    redirect("/get-started");
+  }
 
   const sp = await searchParams;
   const initialDuration = (

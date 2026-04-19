@@ -29,7 +29,8 @@ export default function LoginPage() {
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       throw { code: data.error ?? "session_create_failed", message: data.error };
     }
-    router.push("/account/bookings");
+    // /get-started redirects straight through if profile is already complete.
+    router.push("/get-started");
     router.refresh();
   }
 

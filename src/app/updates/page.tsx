@@ -19,6 +19,16 @@ const UPDATES: Update[] = [
   {
     date: "2026-04-18",
     tag: "shipped",
+    title: "Post-Google-signup profile step",
+    body: [
+      "Google sign-in doesn't give us age (Google won't share it) — so after Google signup you land on /get-started to fill in age (5–18) and confirm your name.",
+      "Returning users skip the page automatically; the route bounces straight to the dashboard if the profile is already complete.",
+      "Trying to hit /book without a complete profile now redirects back to finish it. Age is required for picking the right material.",
+    ],
+  },
+  {
+    date: "2026-04-18",
+    tag: "shipped",
     title: "Privacy policy + terms of service",
     body: [
       "Added /privacy and /terms pages written in plain language — what we collect, how long we keep it, cancellation rules, contact.",
