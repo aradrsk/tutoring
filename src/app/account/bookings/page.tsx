@@ -27,6 +27,8 @@ export default async function AccountBookingsPage() {
       startAt: schema.bookings.startAt,
       durationMinutes: schema.bookings.durationMinutes,
       status: schema.bookings.status,
+      paymentStatus: schema.bookings.paymentStatus,
+      priceCents: schema.bookings.priceCents,
       userName: schema.user.name,
       userEmail: schema.user.email,
     })
@@ -233,6 +235,8 @@ type BookingRowData = {
   startAt: Date;
   durationMinutes: number;
   status: "confirmed" | "cancelled";
+  paymentStatus: "free" | "pending" | "paid" | "refunded";
+  priceCents: number;
   userName: string | null;
   userEmail: string | null;
 };
@@ -259,7 +263,10 @@ function BookingRow({
   return (
     <li className="flex flex-col gap-3 rounded-2xl border-2 border-[#191A23] bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p className="text-lg font-medium">{formatDateTime(booking.startAt)}</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-lg font-medium">{formatDateTime(booking.startAt)}</p>
+          <PaymentBadge status={booking.paymentStatus} />
+        </div>
         <p className="mt-0.5 text-sm text-[#191A23]/60">
           {booking.durationMinutes} minutes
           {viewerRole === "teacher" && booking.userName
@@ -283,6 +290,32 @@ function BookingRow({
         )}
       </div>
     </li>
+  );
+}
+
+function PaymentBadge({
+  status,
+}: {
+  status: "free" | "pending" | "paid" | "refunded";
+}) {
+  const styles = {
+    free: "bg-[#B9FF66] text-[#191A23]",
+    paid: "bg-[#191A23] text-white",
+    pending: "bg-amber-300 text-[#191A23]",
+    refunded: "bg-zinc-200 text-[#191A23]",
+  }[status];
+  const label = {
+    free: "Free",
+    paid: "Paid",
+    pending: "Payment pending",
+    refunded: "Refunded",
+  }[status];
+  return (
+    <span
+      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest ${styles}`}
+    >
+      {label}
+    </span>
   );
 }
 

@@ -11,7 +11,9 @@ import {
   type Duration,
 } from "@/lib/availability";
 import { db, schema } from "@/lib/db";
+import { priceCentsFor } from "@/lib/stripe";
 import { BrandMark } from "@/components/brand-mark";
+import { and, eq } from "drizzle-orm";
 import { asc } from "drizzle-orm";
 import { BookingWizard, type DayWithStarts } from "./booking-wizard";
 import { LogoutButton } from "@/app/account/bookings/logout-button";
@@ -87,6 +89,24 @@ export default async function BookPage({
     daysByDuration[45].some((d) => d.starts.length > 0) ||
     daysByDuration[60].some((d) => d.starts.length > 0);
 
+  // Free if the user has no currently-confirmed booking (cancelled ones reset).
+  const priorBookings = await db
+    .select({ id: schema.bookings.id })
+    .from(schema.bookings)
+    .where(
+      and(
+        eq(schema.bookings.userId, session.user.id),
+        eq(schema.bookings.status, "confirmed")
+      )
+    )
+    .limit(1);
+  const isFirstSession = priorBookings.length === 0;
+  const priceCentsByDuration = {
+    30: priceCentsFor(30),
+    45: priceCentsFor(45),
+    60: priceCentsFor(60),
+  };
+
   return (
     <main className="min-h-screen bg-zinc-50">
       <header className="border-b-2 border-[#191A23]/10 bg-white">
@@ -142,6 +162,8 @@ export default async function BookPage({
           <BookingWizard
             initialDuration={initialDuration}
             daysByDuration={daysByDuration}
+            isFirstSession={isFirstSession}
+            priceCentsByDuration={priceCentsByDuration}
           />
         )}
       </div>

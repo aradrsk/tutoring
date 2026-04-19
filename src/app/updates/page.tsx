@@ -17,6 +17,18 @@ type Update = {
 
 const UPDATES: Update[] = [
   {
+    date: "2026-04-19",
+    tag: "shipped",
+    title: "Stripe payments + first session free",
+    body: [
+      "Every account gets one free session to start. After that, sessions are paid: 30 min / 45 min / 60 min priced in CAD, configurable via env.",
+      "Paid bookings now redirect through Stripe Checkout. The slot is locked when you click confirm (via the Postgres exclusion constraint), held for 30 min while you finish checkout, and released if you abandon.",
+      "After payment, Stripe sends you back to /book/success which verifies the session with Stripe, marks the booking paid, and fires the confirmation email.",
+      "Cancelling a booking — even a paid one — resets you to the free tier. Next booking is on the house again. Deliberate: we want you to actually show up, not get stuck.",
+      "Dashboard now shows a payment status pill on every booking: Free, Paid, Payment pending.",
+    ],
+  },
+  {
     date: "2026-04-18",
     tag: "design",
     title: "Brand mark lands on every page",

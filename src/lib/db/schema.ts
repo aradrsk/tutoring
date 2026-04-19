@@ -22,6 +22,13 @@ export const bookingStatusEnum = pgEnum("booking_status", [
   "cancelled",
 ]);
 
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "free",
+  "pending",
+  "paid",
+  "refunded",
+]);
+
 // ===== user =====
 // Firebase owns identity (UID, password hash, OAuth links, email verification).
 // We keep this table for app-specific metadata (role, age) and to back FK
@@ -86,6 +93,10 @@ export const bookings = pgTable(
     // Treated as read-only from app code; don't set on insert/update.
     endAt: timestamp("end_at", { withTimezone: true }),
     status: bookingStatusEnum("status").notNull().default("confirmed"),
+    paymentStatus: paymentStatusEnum("payment_status").notNull().default("free"),
+    priceCents: integer("price_cents").notNull().default(0),
+    stripeSessionId: text("stripe_session_id"),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
     cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
     cancelledBy: text("cancelled_by").references(() => user.id),
     createdAt: timestamp("created_at", { withTimezone: true })

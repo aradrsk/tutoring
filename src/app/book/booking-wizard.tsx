@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   createBookingAction,
@@ -20,9 +20,13 @@ export type DayWithStarts = {
 export function BookingWizard({
   initialDuration,
   daysByDuration,
+  isFirstSession,
+  priceCentsByDuration,
 }: {
   initialDuration: Duration;
   daysByDuration: Record<Duration, DayWithStarts[]>;
+  isFirstSession: boolean;
+  priceCentsByDuration: Record<Duration, number>;
 }) {
   const router = useRouter();
   const [duration, setDuration] = useState<Duration>(initialDuration);
@@ -42,19 +46,46 @@ export function BookingWizard({
     ? daysByDate.get(effectiveSelectedDate) ?? null
     : null;
 
-  if (result?.ok) {
-    // Booking succeeded — kick to dashboard.
-    if (typeof window !== "undefined") {
+  const checkoutUrl = result?.ok ? result.checkoutUrl : undefined;
+  const didSucceedFree = result?.ok && !result.checkoutUrl;
+
+  useEffect(() => {
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl;
+    }
+  }, [checkoutUrl]);
+
+  useEffect(() => {
+    if (didSucceedFree) {
       router.push("/account/bookings");
       router.refresh();
+    }
+  }, [didSucceedFree, router]);
+
+  if (result?.ok) {
+    if (result.checkoutUrl) {
+      return (
+        <div className="rounded-[32px] border-2 border-[#191A23] bg-white p-10 text-center shadow-[0_6px_0_0_#191A23]">
+          <h2 className="text-2xl font-medium">Redirecting to checkout…</h2>
+          <p className="mt-2 text-[#191A23]/70">
+            Opening Stripe. If it doesn&apos;t start automatically,{" "}
+            <a href={result.checkoutUrl} className="font-medium underline">
+              click here
+            </a>
+            .
+          </p>
+        </div>
+      );
     }
     return (
       <div className="rounded-[32px] border-2 border-[#191A23] bg-white p-10 text-center shadow-[0_6px_0_0_#191A23]">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#B9FF66]">
           <span className="text-3xl">✓</span>
         </div>
-        <h2 className="text-2xl font-medium">Booked</h2>
-        <p className="mt-2 text-[#191A23]/70">Redirecting to your dashboard…</p>
+        <h2 className="text-2xl font-medium">Booked (free session)</h2>
+        <p className="mt-2 text-[#191A23]/70">
+          Your first session is on the house. Redirecting to your dashboard…
+        </p>
       </div>
     );
   }
@@ -188,6 +219,14 @@ export function BookingWizard({
               <Row label="Date" value={selectedStart.iso ? formatReviewDate(selectedStart.iso) : ""} />
               <Row label="Time" value={`${selectedStart.local} (Toronto)`} />
               <Row label="Length" value={`${duration} minutes`} />
+              <Row
+                label="Price"
+                value={
+                  isFirstSession
+                    ? "Free — first session"
+                    : formatPriceCents(priceCentsByDuration[duration])
+                }
+              />
               <Row label="Where" value="Teacher's home (address in confirmation email)" />
               <Row label="Cancel by" value="24 hours before start" />
             </dl>
@@ -206,7 +245,11 @@ export function BookingWizard({
               disabled={pending}
               className="w-full rounded-2xl bg-[#191A23] px-5 py-4 text-[15px] font-medium text-white transition hover:bg-[#2a2b38] disabled:opacity-60"
             >
-              {pending ? "Confirming…" : "Confirm booking"}
+              {pending
+                ? "Confirming…"
+                : isFirstSession
+                ? "Confirm (free session)"
+                : `Pay ${formatPriceCents(priceCentsByDuration[duration])} & confirm`}
             </button>
           </form>
         )}
@@ -391,6 +434,14 @@ function Row({ label, value }: { label: string; value: string }) {
       <dd className="text-right font-medium">{value}</dd>
     </div>
   );
+}
+
+function formatPriceCents(cents: number): string {
+  return new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency: "CAD",
+    minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
+  }).format(cents / 100);
 }
 
 function formatReviewDate(iso: string): string {
