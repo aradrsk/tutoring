@@ -18,6 +18,17 @@ type Update = {
 const UPDATES: Update[] = [
   {
     date: "2026-04-19",
+    tag: "design",
+    title: "Confirmation dialogs + duration-grid slots + friendlier copy",
+    body: [
+      "Booking now asks 'are you sure?' before submitting. Free sessions get a softer 'Lock in your free session?'; paid sessions get 'Ready to pay and book?' with the amount in the confirm button.",
+      "Cancelling asks 'Cancel this session?' with the exact date/time and reminds you that the slot opens up and your free session resets.",
+      "Calendar now snaps to the duration: pick 60 min → slots show at every hour, not every 15 min. Pick 30 → :00 and :30 only. A 60-min booking still blocks overlapping 30-min attempts via the DB exclusion constraint.",
+      "Student-facing copy softened: dashboard greeting, empty-state headline, and supporting lines now read more like a friend than a form.",
+    ],
+  },
+  {
+    date: "2026-04-19",
     tag: "fix",
     title: "Cancellation window: 24h → 12h",
     body: [

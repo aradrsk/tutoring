@@ -6,7 +6,7 @@ import { db, schema } from "@/lib/db";
 import { TZ } from "@/lib/availability";
 import { BrandMark } from "@/components/brand-mark";
 import { LogoutButton } from "./logout-button";
-import { cancelBookingAction } from "./actions";
+import { CancelButton } from "./cancel-button";
 
 export const dynamic = "force-dynamic";
 
@@ -117,7 +117,7 @@ export default async function AccountBookingsPage() {
           <p className="text-[#191A23]/60">
             {user.role === "teacher"
               ? "Teacher view — all confirmed bookings."
-              : "Your student dashboard."}
+              : "Welcome back. Here's where your sessions live."}
           </p>
         </div>
 
@@ -153,11 +153,15 @@ export default async function AccountBookingsPage() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#B9FF66]">
                 <span className="text-3xl">📅</span>
               </div>
-              <h3 className="text-xl font-medium">No upcoming sessions</h3>
+              <h3 className="text-xl font-medium">
+                {user.role === "teacher"
+                  ? "No upcoming sessions"
+                  : "Ready to book your first session?"}
+              </h3>
               <p className="mt-2 text-sm text-[#191A23]/60">
                 {user.role === "teacher"
                   ? "Once students book, their sessions will appear here."
-                  : "Pick a time that works and we'll lock it in."}
+                  : "Pick a time, we'll lock it in, and Theepa will see you there. First one's free."}
               </p>
               {user.role !== "teacher" && (
                 <div className="mt-6">
@@ -281,12 +285,11 @@ function BookingRow({
           <span className="text-xs text-[#191A23]/50">{cancelLockReason}</span>
         )}
         {canCancel && (
-          <form action={cancelBookingAction}>
-            <input type="hidden" name="id" value={booking.id} />
-            <button className="rounded-full border-2 border-red-500/30 bg-white px-4 py-2 text-xs font-medium text-red-600 hover:bg-red-50">
-              Cancel
-            </button>
-          </form>
+          <CancelButton
+            bookingId={booking.id}
+            whenLabel={formatDateTime(booking.startAt)}
+            durationMinutes={booking.durationMinutes}
+          />
         )}
       </div>
     </li>

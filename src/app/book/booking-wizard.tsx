@@ -7,6 +7,7 @@ import {
   type BookingResult,
 } from "./actions";
 import type { Duration } from "@/lib/availability";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
 export type StartSlot = { iso: string; local: string };
 export type DayWithStarts = {
@@ -39,6 +40,7 @@ export function BookingWizard({
   const days = daysByDuration[duration];
   const daysByDate = new Map(days.map((d) => [d.date, d]));
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   // Keep selected date consistent when duration changes
   const effectiveSelectedDate =
     selectedDate && daysByDate.has(selectedDate) ? selectedDate : null;
@@ -211,10 +213,7 @@ export function BookingWizard({
             Pick a start time first.
           </p>
         ) : (
-          <form action={formAction} className="mt-5 space-y-4">
-            <input type="hidden" name="duration" value={duration} />
-            <input type="hidden" name="start_at" value={selectedStart.iso} />
-
+          <div className="mt-5 space-y-4">
             <dl className="rounded-2xl bg-zinc-50 p-5 text-sm">
               <Row label="Date" value={selectedStart.iso ? formatReviewDate(selectedStart.iso) : ""} />
               <Row label="Time" value={`${selectedStart.local} (Toronto)`} />
@@ -241,8 +240,9 @@ export function BookingWizard({
             )}
 
             <button
-              type="submit"
+              type="button"
               disabled={pending}
+              onClick={() => setConfirmOpen(true)}
               className="w-full rounded-2xl bg-[#191A23] px-5 py-4 text-[15px] font-medium text-white transition hover:bg-[#2a2b38] disabled:opacity-60"
             >
               {pending
@@ -251,7 +251,41 @@ export function BookingWizard({
                 ? "Confirm (free session)"
                 : `Pay ${formatPriceCents(priceCentsByDuration[duration])} & confirm`}
             </button>
-          </form>
+
+            <ConfirmDialog
+              open={confirmOpen}
+              title={isFirstSession ? "Lock in your free session?" : "Ready to pay and book?"}
+              body={
+                <>
+                  <p>
+                    <strong>{formatReviewDate(selectedStart.iso)}</strong> at{" "}
+                    <strong>{selectedStart.local}</strong> (Toronto), for{" "}
+                    <strong>{duration} minutes</strong>.
+                  </p>
+                  <p className="mt-3">
+                    {isFirstSession
+                      ? "Your first session is on us. You can cancel up to 12 hours before — the free spot resets if you do."
+                      : `You'll be redirected to Stripe to pay ${formatPriceCents(priceCentsByDuration[duration])}. You can cancel up to 12 hours before.`}
+                  </p>
+                </>
+              }
+              confirmLabel={
+                isFirstSession
+                  ? "Yes, book it"
+                  : `Yes, pay ${formatPriceCents(priceCentsByDuration[duration])}`
+              }
+              cancelLabel="Wait, go back"
+              pending={pending}
+              onConfirm={() => {
+                setConfirmOpen(false);
+                const fd = new FormData();
+                fd.set("duration", String(duration));
+                fd.set("start_at", selectedStart.iso);
+                formAction(fd);
+              }}
+              onCancel={() => setConfirmOpen(false)}
+            />
+          </div>
         )}
       </section>
     </div>

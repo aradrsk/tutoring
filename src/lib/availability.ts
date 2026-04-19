@@ -4,7 +4,9 @@ import { eq, and, gte, lte, ne } from "drizzle-orm";
 
 // America/Toronto fixed timezone per PRD.
 export const TZ = "America/Toronto";
-export const SLOT_GRANULARITY_MIN = 15;
+// Each duration walks its own grid: 30-min sessions → :00 / :30 only;
+// 60-min sessions → hour marks only. A 60-min booking naturally occupies
+// two 30-min slots because the exclusion constraint blocks the overlap.
 export const MIN_LEAD_MIN = 60; // no booking less than 1h out
 export const DEFAULT_HORIZON_DAYS = 30;
 
@@ -91,8 +93,8 @@ export function iterateTorontoDays(from: Date, days: number): string[] {
   return out;
 }
 
-/** Round a Date up to the next 15-minute boundary (UTC epoch math). */
-export function ceilToGrid(d: Date, minutes = SLOT_GRANULARITY_MIN): Date {
+/** Round a Date up to the next `minutes`-minute boundary (UTC epoch math). */
+export function ceilToGrid(d: Date, minutes: number): Date {
   const ms = d.getTime();
   const step = minutes * 60 * 1000;
   return new Date(Math.ceil(ms / step) * step);
@@ -159,11 +161,13 @@ export function generateSlots(input: {
       const winStart = torontoWallToUtc(ymd, rule.startTime.slice(0, 5));
       const winEnd = torontoWallToUtc(ymd, rule.endTime.slice(0, 5));
 
-      // Walk the 15-min grid from winStart; each candidate start s must satisfy:
+      // Grid step equals the chosen duration so each length snaps to clean
+      // starts: 30 → :00/:30, 60 → hourly. 45-min walks at 45-min intervals
+      // from the window start. A candidate start s is valid when:
       //   s + duration <= winEnd
       //   s >= cutoff
       //   [s, s + duration) does not overlap any confirmed booking
-      let cursor = ceilToGrid(winStart);
+      let cursor = ceilToGrid(winStart, duration);
       while (cursor.getTime() + duration * 60 * 1000 <= winEnd.getTime()) {
         if (cursor.getTime() >= cutoff.getTime()) {
           const candidateEnd = new Date(cursor.getTime() + duration * 60 * 1000);
@@ -174,7 +178,7 @@ export function generateSlots(input: {
           });
           if (!overlaps) starts.push(new Date(cursor));
         }
-        cursor = new Date(cursor.getTime() + SLOT_GRANULARITY_MIN * 60 * 1000);
+        cursor = new Date(cursor.getTime() + duration * 60 * 1000);
       }
     }
 
