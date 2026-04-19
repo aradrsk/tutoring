@@ -35,6 +35,8 @@ export function SiteFooter() {
           <FooterCol
             title="Elsewhere"
             links={[
+              { href: "/privacy", label: "Privacy" },
+              { href: "/terms", label: "Terms" },
               { href: "https://aradrsk.com", label: "aradrsk.com", external: true },
               { href: "https://github.com/aradrsk/tutoring", label: "GitHub", external: true },
             ]}

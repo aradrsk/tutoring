@@ -18,6 +18,16 @@ type Update = {
 const UPDATES: Update[] = [
   {
     date: "2026-04-18",
+    tag: "shipped",
+    title: "Privacy policy + terms of service",
+    body: [
+      "Added /privacy and /terms pages written in plain language — what we collect, how long we keep it, cancellation rules, contact.",
+      "Covers K-12 specifics: parental guidance for under-13 accounts, account deletion on request.",
+      "Linked from the footer. Firebase OAuth consent can now point at these URLs for the 'App privacy policy' and 'App terms' links.",
+    ],
+  },
+  {
+    date: "2026-04-18",
     tag: "fix",
     title: "Human-readable auth errors",
     body: [
