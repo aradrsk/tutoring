@@ -289,6 +289,7 @@ function BookingRow({
             bookingId={booking.id}
             whenLabel={formatDateTime(booking.startAt)}
             durationMinutes={booking.durationMinutes}
+            wasPaid={booking.paymentStatus === "paid"}
           />
         )}
       </div>

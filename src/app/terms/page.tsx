@@ -67,6 +67,11 @@ export default function TermsPage() {
               contacting the teacher directly.
             </li>
             <li>
+              If you cancel a paid booking 12+ hours before the start time, you
+              get a full refund back to the original card — usually lands in
+              5–10 business days via Stripe.
+            </li>
+            <li>
               The teacher can cancel any session at any time (emergencies
               happen). You&apos;ll be notified by email and can rebook.
             </li>

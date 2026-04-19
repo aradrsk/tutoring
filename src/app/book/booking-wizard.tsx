@@ -265,7 +265,7 @@ export function BookingWizard({
                   <p className="mt-3">
                     {isFirstSession
                       ? "Your first session is on us. You can cancel up to 12 hours before — the free spot resets if you do."
-                      : `You'll be redirected to Stripe to pay ${formatPriceCents(priceCentsByDuration[duration])}. You can cancel up to 12 hours before.`}
+                      : `You'll be redirected to Stripe to pay ${formatPriceCents(priceCentsByDuration[duration])}. Full refund if you cancel 12+ hours before.`}
                   </p>
                 </>
               }

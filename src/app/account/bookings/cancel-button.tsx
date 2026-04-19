@@ -9,10 +9,12 @@ export function CancelButton({
   bookingId,
   whenLabel,
   durationMinutes,
+  wasPaid,
 }: {
   bookingId: string;
   whenLabel: string;
   durationMinutes: number;
+  wasPaid: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -59,6 +61,12 @@ export function CancelButton({
               The slot opens up for someone else right away. Your first free
               session resets — you can rebook whenever works for you.
             </p>
+            {wasPaid && (
+              <p className="mt-3">
+                <strong>Full refund</strong> back to your card — usually lands
+                in 5–10 days.
+              </p>
+            )}
             {error && (
               <p
                 role="alert"

@@ -18,6 +18,17 @@ type Update = {
 const UPDATES: Update[] = [
   {
     date: "2026-04-19",
+    tag: "shipped",
+    title: "Automatic refunds on paid cancellations",
+    body: [
+      "Cancel a paid session 12+ hours before it starts and you get a full refund back to the original card — we fire a Stripe refund at the same moment the booking is cancelled.",
+      "Shows up on the dashboard as a 'Refunded' badge. Usually lands on your statement in 5–10 business days.",
+      "Cancel dialog now promises the refund explicitly. Terms updated to match.",
+      "If the refund call fails for any reason, the cancel is rolled back so we never end up in the 'cancelled but not refunded' state silently.",
+    ],
+  },
+  {
+    date: "2026-04-19",
     tag: "design",
     title: "Confirmation dialogs + duration-grid slots + friendlier copy",
     body: [
